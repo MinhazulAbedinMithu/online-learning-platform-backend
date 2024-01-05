@@ -3,6 +3,7 @@ import sendResponse from '../../utils/sendResponse';
 import { UserModel } from '../user/user.model';
 import { categoryServices } from './category.service';
 
+// Create Category
 const createCategory = catchAsync(async (req, res, next) => {
   const user = await UserModel.isUserExist(req.user.username);
   const newCat = await categoryServices.createCategory({
@@ -18,6 +19,7 @@ const createCategory = catchAsync(async (req, res, next) => {
   });
 });
 
+//Get All Category
 const getAllCategories = catchAsync(async (req, res, next) => {
   const result = await categoryServices.getAllCategories();
   sendResponse(res, {
