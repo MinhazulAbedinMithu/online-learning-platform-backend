@@ -4,6 +4,7 @@ import CourseModel from './course.model';
 import ReviewModel from '../review/review.model';
 import AppError from '../../error/AppError';
 import { UserModel } from '../user/user.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createCourse = async (payload: Partial<TCourse>) => {
   const result = await CourseModel.create(payload);
@@ -11,81 +12,20 @@ const createCourse = async (payload: Partial<TCourse>) => {
 };
 
 const getAllCourses = async (query: Record<string, unknown>) => {
-  const sortableFields = [
-    'title',
-    'price',
-    'startDate',
-    'endDate',
-    'language',
-    'durationInWeeks',
-  ];
-  // filter : minPrice, maxPrice, tags, startDate, endDate, language, provider, durationInWeeks, and level
-  const sortBy: string = (query.sortBy as string) || 'startDate';
-  const sortOrder = query.sortOrder || 'asc';
-  const minPrice = Number(query.minPrice) || 0;
-  const maxPrice = Number(query.maxPrice) || 9999999;
-  const tags = query.tags;
-  const startDate = query.startDate;
-  const endDate = query.endDate;
-  const language = query.language;
-  const provider = query.provider;
-  const durationInWeeks = Number(query.durationInWeeks);
-  const level = query.level;
-  const page = Number(query.page) || 1;
-  const limit = Number(query.page) || 10;
+  const courseQuery = new QueryBuilder(CourseModel.find(), query)
+    .search(['title'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
-  //Match stage
-  const matchStage: PipelineStage = {
-    $match: {
-      price: { $gte: minPrice, $lte: maxPrice },
-    },
+  const result = await courseQuery.modelQuery;
+  const meta = await courseQuery.countTotal();
+
+  return {
+    meta,
+    result,
   };
-  if (tags) {
-    matchStage.$match['tags.name'] = tags;
-  }
-  if (language) {
-    matchStage.$match.language = language;
-  }
-  if (provider) {
-    matchStage.$match.provider = provider;
-  }
-  if (durationInWeeks) {
-    matchStage.$match.durationInWeeks = durationInWeeks;
-  }
-  if (level) {
-    matchStage.$match['details.level'] = level;
-  }
-  if (startDate) {
-    matchStage.$match.startDate = { $gte: startDate };
-  }
-  if (endDate) {
-    matchStage.$match.endDate = { $lte: endDate };
-  }
-
-  const sortObj: { [key: string]: any } = {};
-  if (sortableFields.includes(sortBy as 'string')) {
-    sortObj[sortBy] = sortOrder === 'asc' ? 1 : -1;
-  }
-
-  const result = await CourseModel.aggregate([
-    // stage-1 : Filtering
-    matchStage,
-    // stage-2 : Sorting: sortBy & sortOrder
-    // sortStage,
-    {
-      $sort: sortObj,
-    },
-    // stage-3 : Paginate
-    {
-      $skip: (page - 1) * limit,
-    },
-    // stage-4 : Paginating
-    {
-      $limit: limit,
-    },
-  ]);
-
-  return result;
 };
 
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {

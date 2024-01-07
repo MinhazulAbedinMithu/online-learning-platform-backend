@@ -19,7 +19,12 @@ const createCourse = catchAsync(async (req, res, next) => {
 });
 
 const getAllCourses = catchAsync(async (req, res, next) => {
-  const retrievedCourses = await courseServices.getAllCourses(req.query);
+  const customQuery = { ...req.query };
+  customQuery['fields'] = req.query?.fields
+    ? `-studyPlan,${req.query?.fields}`
+    : '-studyPlan';
+
+  const retrievedCourses = await courseServices.getAllCourses(customQuery);
   sendResponse(res, {
     success: true,
     statusCode: 200,
