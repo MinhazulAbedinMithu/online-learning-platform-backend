@@ -1,70 +1,95 @@
 import { z } from 'zod';
 
-const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-
-const tagvalidationSchema = z.object({
-  name: z.string().min(1),
-  isDeleted: z.boolean().default(false).optional(),
+const moduleSchema = z.object({
+  title: z.string(),
+  type: z.enum(['Live Class', 'Assignment', 'Test', 'Support Class']),
+  src: z.string(),
 });
 
-const courseDetailsValidationSchema = z.object({
-  level: z.string().min(1),
-  description: z.string().min(5),
+const milestoneSchema = z.object({
+  title: z.string(),
+  modules: z.array(moduleSchema),
 });
 
-const courseDetailsUpdateValidationSchema = z.object({
-  level: z.string().min(1).optional(),
-  description: z.string().min(5).optional(),
+const tagSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((data) => !!data, { message: 'tag name is Required' }),
+  isDeleted: z.boolean().default(false),
+});
+
+const detailSchema = z.object({
+  level: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((data) => !!data, { message: 'course level is Required' }),
+  description: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((data) => !!data, { message: 'course description is Required' }),
+});
+
+const instructorSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((data) => !!data, { message: 'instructor name is Required' }),
+  photo: z.string().optional(),
+  designation: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((data) => !!data, { message: 'designation is Required' }),
+  organization: z.string().optional(),
 });
 
 const createCourseValidationSchema = z.object({
   body: z.object({
-    title: z.string(),
-    instructor: z.string(),
-    categoryId: z.string(),
-    price: z.number(),
-    tags: z.array(tagvalidationSchema),
-    startDate: z.string().refine((value) => dateRegex.test(value), {
-      message: 'Invalid date format. Use "YYYY-MM-DD".',
-    }),
-    endDate: z.string().refine((value) => dateRegex.test(value), {
-      message: 'Invalid date format. Use "YYYY-MM-DD".',
-    }),
-    language: z.string(),
-    provider: z.string(),
-    durationInWeeks: z.number().optional(),
-    details: courseDetailsValidationSchema,
-    isDeleted: z.boolean().default(false).optional(),
-  }),
-});
-
-const updateCourseValidationSchema = z.object({
-  body: z.object({
-    title: z.string().optional(),
-    instructor: z.string().optional(),
-    categoryId: z.string().optional(),
-    price: z.number().optional(),
-    tags: z.array(tagvalidationSchema).optional(),
+    title: z
+      .string()
+      .min(1)
+      .max(255)
+      .refine((data) => !!data, { message: 'title is Required' }),
+    categoryId: z
+      .string()
+      .refine((data) => !!data, { message: 'categoryId is Required' }),
+    price: z
+      .number()
+      .refine((data) => !!data, { message: 'price is Required' }),
+    tags: z.array(tagSchema),
     startDate: z
       .string()
-      .refine((value) => dateRegex.test(value), {
-        message: 'Invalid date format. Use "YYYY-MM-DD".',
-      })
-      .optional(),
-    endDate: z
+      .refine((data) => !!data, { message: 'startDate is Required' }),
+    endDate: z.string().optional(),
+    details: detailSchema.refine((data) => !!data, {
+      message: 'course details is Required',
+    }),
+    thumbnail: z
       .string()
-      .refine((value) => dateRegex.test(value), {
-        message: 'Invalid date format. Use "YYYY-MM-DD".',
-      })
-      .optional(),
-    language: z.string().optional(),
-    provider: z.string().optional(),
-    details: courseDetailsUpdateValidationSchema.optional(),
-    isDeleted: z.boolean().default(false).optional(),
+      .refine((data) => !!data, { message: 'thumbnail is Required' }),
+    sits: z.number().refine((data) => !!data, { message: 'sits is Required' }),
+    promo: z.string().optional(),
+    instructor: z.array(instructorSchema).refine((data) => data.length > 0, {
+      message: 'at least one instructor is Required',
+    }),
+    requirements: z.array(z.string()),
+    benifits: z.array(z.string()),
+    studyPlan: z
+      .array(milestoneSchema)
+      .refine((data) => data.length > 0, { message: 'study plan is Required' }),
+    createdBy: z
+      .string()
+      .refine((data) => !!data, { message: 'createdBy is Required' }),
+    isDeleted: z.boolean().default(false),
   }),
 });
 
 export const courseValidations = {
   createCourseValidationSchema,
-  updateCourseValidationSchema,
+  // updateCourseValidationSchema,
 };

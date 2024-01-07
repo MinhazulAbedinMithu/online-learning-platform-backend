@@ -5,7 +5,6 @@ import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import { courseRoutes } from './app/modules/course/course.route';
 import { categoryRoutes } from './app/modules/category/category.route';
 import { reviewRoutes } from './app/modules/review/review.route';
-import { coursesRoutes } from './app/modules/course/courses.route';
 import { authRoutes } from './app/modules/user/user.route';
 
 const app = express();

@@ -1,16 +1,11 @@
 import { PipelineStage } from 'mongoose';
 import { TCourse, TTag } from './course.interface';
 import CourseModel from './course.model';
-import { calculateCourseDuration } from './course.utils';
 import ReviewModel from '../review/review.model';
 import AppError from '../../error/AppError';
 import { UserModel } from '../user/user.model';
 
 const createCourse = async (payload: Partial<TCourse>) => {
-  payload.durationInWeeks = calculateCourseDuration(
-    payload.startDate as string,
-    payload.endDate as string,
-  );
   const result = await CourseModel.create(payload);
   return result;
 };
@@ -106,10 +101,10 @@ const updateCourse = async (id: string, payload: Partial<TCourse>) => {
       modifiedData[`details.${key}`] = value;
     }
   }
-  modifiedData.durationInWeeks = calculateCourseDuration(
-    startDate as string,
-    endDate as string,
-  );
+  // modifiedData.durationInWeeks = calculateCourseDuration(
+  //   startDate as string,
+  //   endDate as string,
+  // );
 
   const updatedCoursewithOutTags = await CourseModel.findByIdAndUpdate(
     id,

@@ -15,13 +15,13 @@ router.post(
 
 router.get('/', courseControllers.getAllCourses);
 
-router
-  .route('/:courseId')
-  .put(
-    auth('admin'),
-    validateRequest(courseValidations.updateCourseValidationSchema),
-    courseControllers.updateCourse,
-  );
+// router
+//   .route('/:courseId')
+//   .put(
+//     auth('admin'),
+//     validateRequest(courseValidations.updateCourseValidationSchema),
+//     courseControllers.updateCourse,
+//   );
 
 router
   .route('/:courseId/reviews')
