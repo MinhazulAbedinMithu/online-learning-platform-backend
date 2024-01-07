@@ -21,6 +21,7 @@ export type TModuleType =
 export type TModule = {
   title: string;
   type: TModuleType;
+  src: string;
 };
 export type TMilestone = {
   title: string;
@@ -33,6 +34,7 @@ export type TCourse = {
   price: number;
   tags: TTag[];
   startDate: string;
+  endDate: string;
   schedule: string;
   details: TDetails;
   thumbnail: string;
@@ -42,6 +44,6 @@ export type TCourse = {
   requirements: string[];
   benifits: string[];
   studyPlan: TMilestone[];
-  createdBy?: Types.ObjectId;
+  createdBy: Types.ObjectId;
   isDeleted: boolean;
 };

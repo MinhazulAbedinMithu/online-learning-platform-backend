@@ -1,5 +1,12 @@
 import { Schema, model } from 'mongoose';
-import { TCourse, TDetails, TTag } from './course.interface';
+import {
+  TCourse,
+  TDetails,
+  TInstructor,
+  TMilestone,
+  TModule,
+  TTag,
+} from './course.interface';
 
 const tagSchema = new Schema<TTag>({
   name: {
@@ -22,16 +29,53 @@ const detailSchema = new Schema<TDetails>({
     required: [true, 'course description is Required'],
   },
 });
+const instructorSchema = new Schema<TInstructor>({
+  name: {
+    type: String,
+    required: true,
+  },
+  photo: {
+    type: String,
+  },
+  designation: {
+    type: String,
+    required: true,
+  },
+  organization: {
+    type: String,
+  },
+});
+const moduleSchema = new Schema<TModule>({
+  title: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: ['Live Class', 'Assignment', 'Test', 'Support Class'],
+    required: true,
+  },
+  src: {
+    type: String,
+    required: true,
+  },
+});
+const milestoneSchema = new Schema<TMilestone>({
+  title: {
+    type: String,
+    required: true,
+  },
+  modules: {
+    type: [moduleSchema],
+    required: true,
+  },
+});
 const courseSchema = new Schema<TCourse>(
   {
     title: {
       type: String,
       unique: true,
       required: [true, 'title is Required'],
-    },
-    instructor: {
-      type: String,
-      required: [true, 'instructor is Required'],
     },
     categoryId: {
       type: Schema.Types.ObjectId,
@@ -51,21 +95,31 @@ const courseSchema = new Schema<TCourse>(
     },
     endDate: {
       type: String,
-      required: [true, 'endDate is Required'],
-    },
-    language: {
-      type: String,
-    },
-    provider: {
-      type: String,
-      required: [true, 'provider is Required'],
-    },
-    durationInWeeks: {
-      type: Number,
     },
     details: {
       type: detailSchema,
       required: [true, 'course details is Required'],
+    },
+    thumbnail: {
+      type: String,
+      required: true,
+    },
+    sits: {
+      type: Number,
+      required: true,
+    },
+    promo: {
+      type: String,
+    },
+    instructor: {
+      type: [instructorSchema],
+      required: true,
+    },
+    requirements: [String],
+    benifits: [String],
+    studyPlan: {
+      type: [milestoneSchema],
+      required: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
