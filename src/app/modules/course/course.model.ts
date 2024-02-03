@@ -55,10 +55,6 @@ const moduleSchema = new Schema<TModule>({
     enum: ['Live Class', 'Assignment', 'Test', 'Support Class'],
     required: true,
   },
-  src: {
-    type: String,
-    required: true,
-  },
 });
 const milestoneSchema = new Schema<TMilestone>({
   title: {
